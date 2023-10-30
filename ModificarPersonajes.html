@@ -36,17 +36,12 @@
         </div>
       </nav>
 
-    <h1 style="color: blue;">Nuevo personaje</h1>
-    
-        <label>Nombre:</label>
-        <input type="text" id="cajanombre" class="form-control">
-        <label>Imagen:</label>
-        <input type="text" id="cajaimagen" class="form-control">
-        <label>Serie:</label>
+      <h1 style="color: blue;">Personajes y series</h1>
+      <label>Seleccione una serie:</label>
         <select id="selectserie" class="form-control"></select>
-    
-
-    <button id="botoninsertar" class="btn btn-success">Insertar personaje</button>
+      <label>Seleccione un personaje:</label>
+        <select id="selectpersonaje" class="form-control"></select>
+      <button id="modificar" class="btn btn-info">Guardar cambios</button>
 
     <script src="js/jquery371.js"></script>
     <script src="js/bootstrap.bundle.js"></script>
@@ -54,28 +49,18 @@
         var url = "https://apiseriespersonajes.azurewebsites.net/"
         $(document).ready(function() {
             getSeries();
+            getPersonajes();
 
-            $("#botoninsertar").click(function() {
-                var nombre = $("#cajanombre").val();
-                var imagen = $("#cajaimagen").val();
-                var serie = parseInt($("#selectserie").val());
-
-                var personaje = new Object();
-                personaje.idPersonaje = 1;
-                personaje.nombre = nombre;
-                personaje.imagen = imagen;
-                personaje.idSerie = serie;
-
-                var request = "api/personajes";
-                var data = JSON.stringify(personaje);
-                console.log(personaje)
+            $("#modificar").click(function() {
+                var idSerie = $("#selectserie").val();
+                var idPersonaje = $("#selectpersonaje").val();
+                var request = "api/personajes/" + idPersonaje + "/" + idSerie
                 $.ajax({
                     url: url + request,
-                    type: "POST",
-                    contentType: "application/json",
-                    data: data,
+                    type: "PUT",
                     success: function(){
-                        $(location).attr("href", "Personajes.html?idserie=" + personaje.idSerie);
+                        console.log("Modificado")
+                        $(location).attr("href", "Personajes.html?idserie=" + idSerie);
                     }
                 })
             })
@@ -101,6 +86,26 @@
                             value: serie.idSerie
                         });
                         $("#selectserie").append(option);
+                    })
+                    
+                }
+            })
+        }
+
+        function getPersonajes(){
+            var request = "api/personajes"
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function(data){
+
+                    var html = "";
+                    $.each(data, function(index, personaje){
+                        var option = $("<option>", {
+                            text: personaje.nombre,
+                            value: personaje.idPersonaje
+                        });
+                        $("#selectpersonaje").append(option);
                     })
                     
                 }
