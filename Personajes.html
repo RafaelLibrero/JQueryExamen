@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="css/bootstrap.css" rel="stylesheet"/>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-info-subtle">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Series y Personajes</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="HomeSeriesPersonajes.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="NuevoPersonaje.html">Nuevo personaje</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/personajesseries">Modificar personajes</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Series
+                </a>
+                <ul class="dropdown-menu" id="listaseries">
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <table class="table table-dark" id="tablapersonajes">
+        <thead>
+            <tr>
+                <th>Personaje</th>
+                <th>Imagen</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+    <script src="js/jquery371.js"></script>
+    <script src="js/bootstrap.bundle.js"></script>
+    <script>
+        var url = "https://apiseriespersonajes.azurewebsites.net/"
+        $(document).ready(function() {
+            getSeries();
+            getPersonajes();
+        })
+
+        function getSeries(){
+            var request = "api/series"
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function(data){
+                    var html = ""
+                    $.each(data, function(index, serie){
+                        html += '<li><a class="dropdown-item" href="DetalleSeries.html?idserie=' + serie.idSerie +'"/>'
+                        html += serie.nombre + "</li>"
+                    });
+                    $("#listaseries").append(html);
+                }
+            })
+        }
+
+        function getPersonajes(){
+            var id = (new URLSearchParams(window.location.search).get('idserie'));
+            var request = "api/series/personajesserie/" + id;
+            var html = ""
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function(data){
+                    $.each(data, function(index, serie){
+                        html+= '<tr>';
+                        html+= '<td>' + serie.nombre + '</td>';
+                        html+= '<td><img src="' + serie.imagen + '"style="width: 150px; height: 120px"></td>';
+                        html+= '</tr>';
+                        $("#tablapersonajes tbody").html(html);
+                    })
+                }
+            })  
+        }
+    </script>
+</body>
+</html>

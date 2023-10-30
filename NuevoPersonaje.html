@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="css/bootstrap.css" rel="stylesheet"/>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-info-subtle">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Series y Personajes</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="HomeSeriesPersonajes.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="NuevoPersonaje.html">Nuevo personaje</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/personajesseries">Modificar personajes</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Series
+                </a>
+                <ul class="dropdown-menu" id="listaseries">
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+    <h1 style="color: blue;">Nuevo personaje</h1>
+    
+        <label>Nombre:</label>
+        <input type="text" id="cajanombre" class="form-control">
+        <label>Imagen:</label>
+        <input type="text" id="cajaimagen" class="form-control">
+        <label>Serie:</label>
+        <select id="selectserie" class="form-control"></select>
+    
+
+    <button id="botoninsertar" class="btn btn-success">Insertar personaje</button>
+
+    <script src="js/jquery371.js"></script>
+    <script src="js/bootstrap.bundle.js"></script>
+    <script>
+        var url = "https://apiseriespersonajes.azurewebsites.net/"
+        $(document).ready(function() {
+            getSeries();
+
+            $("#botoninsertar").click(function() {
+                var nombre = $("#cajanombre").val();
+                var imagen = $("#cajaimagen").val();
+                var serie = parseInt($("#selectserie").val());
+
+                var personaje = new Object();
+                personaje.idPersonaje = 1;
+                personaje.nombre = nombre;
+                personaje.imagen = imagen;
+                personaje.idSerie = serie;
+
+                var request = "api/personajes";
+                var data = JSON.stringify(personaje);
+                console.log(personaje)
+                $.ajax({
+                    url: url + request,
+                    type: "POST",
+                    contentType: "application/json",
+                    data: data,
+                    success: function(){
+                        $(location).attr("href", "Personajes.html?idserie=" + personaje.idSerie);
+                    }
+                })
+            })
+        })
+
+        function getSeries(){
+            var request = "api/series"
+            $.ajax({
+                url: url + request,
+                type: "GET",
+                success: function(data){
+                    var html = "";
+                    $.each(data, function(index, serie){
+                        html += '<li><a class="dropdown-item" href="DetalleSeries.html?idserie=' + serie.idSerie +'"/>'
+                        html += serie.nombre + "</li>"
+                    });
+                    $("#listaseries").html(html);
+
+                    var html = "";
+                    $.each(data, function(index, serie){
+                        var option = $("<option>", {
+                            text: serie.nombre,
+                            value: serie.idSerie
+                        });
+                        $("#selectserie").append(option);
+                    })
+                    
+                }
+            })
+        }
+
+    </script>
+</body>
+</html>
